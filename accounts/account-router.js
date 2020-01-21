@@ -1,6 +1,7 @@
 const express = require('express');
 
 const knex = require('../data/dbConfig');
+const mw = require('./account-middleware');
 
 const router = express.Router();
 
@@ -18,7 +19,7 @@ router.get('/', (req, res) => {
         });
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', mw.validateId, (req, res) => {
 
     knex
         .select('*')
@@ -34,7 +35,7 @@ router.get('/:id', (req, res) => {
         });
 });
 
-router.post('/', (req, res) => {
+router.post('/', mw.validateContent, (req, res) => {
     
     knex('accounts')
         .insert(req.body, 'id')
@@ -53,7 +54,7 @@ router.post('/', (req, res) => {
         });
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', mw.validateId, mw.validateContent, (req, res) => {
     const { id } = req.params;
     const changes = req.body;
 
@@ -70,7 +71,7 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', mw.validateId, (req, res) => {
     const { id } = req.params;
     knex('accounts')
         .where({ id })
